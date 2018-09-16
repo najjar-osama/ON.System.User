@@ -4,8 +4,8 @@
   "description": "REST API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js"
+    "start": "NODE_ENV=dev node server.js",
+    "server": "NODE_ENV=dev nodemon server.js"
   },
   "author": "Osama Najjar",
   "license": "MIT",
