@@ -33,7 +33,6 @@ mongoose
 app.get("/", (req, res) => {
   res.send("This is Your Hello World!!");
 });
-
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
