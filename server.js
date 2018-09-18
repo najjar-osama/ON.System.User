@@ -4,6 +4,7 @@ require("dotenv").config({
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const passport = require("passport");
 
 const app = express();
 // load routes
@@ -20,6 +21,12 @@ const port = process.env.PORT || 3000;
 app.use("/api/users", usersRouteHandler);
 app.use("/api/profile", profileRouteHandler);
 app.use("/api/posts", postsRouteHandler);
+
+// setting passwport
+
+app.use(passport.initialize());
+
+require("./config/passport")(passport);
 
 mongoose
   .connect(
