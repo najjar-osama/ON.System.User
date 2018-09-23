@@ -31,6 +31,7 @@ router.post("/register", (req, res) => {
       });
       const newUser = new User({
         name: req.body.name,
+        role: req.body.role,
         email: req.body.email,
         avatar,
         password: req.body.password
@@ -42,7 +43,7 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => res.json({ name: user.name }))
             .catch(err => console.log(err));
         });
       });
@@ -75,7 +76,7 @@ router.post("/login", (req, res) => {
           process.env.SECRET_KEY,
           { expiresIn: 3600 },
           (err, token) => {
-            res.json({
+            res.status(200).json({
               success: true,
               token: "Bearer " + token
             });
