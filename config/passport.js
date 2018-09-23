@@ -15,7 +15,7 @@ module.exports = passport => {
           if (user) {
             return done(null, user);
           } else {
-            return null, false;
+            return done(null, false);
           }
         })
         .catch(err => {

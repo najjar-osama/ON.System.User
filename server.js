@@ -42,6 +42,7 @@ mongoose
   })
   .catch(error => {
     console.log(error.message);
+    process.exit();
   });
 
 app.get("/", (req, res) => {
