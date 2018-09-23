@@ -1,10 +1,13 @@
-require("dotenv").config({
-  path: process.env.NODE_ENV === "dev" ? "./dev.env" : "./prod.env"
-});
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
+const logger = require("morgan");
+const dotenv = require("dotenv");
+
+dotenv.load({
+  path: process.env.NODE_ENV === "dev" ? "./dev.env" : "./prod.env"
+});
 
 const app = express();
 // load routes
@@ -18,6 +21,7 @@ app.use(bodyParser.json());
 
 const port = process.env.PORT || 3000;
 
+app.use(logger(process.env.NODE_ENV === "dev" ? "dev" : "combined"));
 app.use("/api/users", usersRouteHandler);
 app.use("/api/profile", profileRouteHandler);
 app.use("/api/posts", postsRouteHandler);
@@ -25,7 +29,6 @@ app.use("/api/posts", postsRouteHandler);
 // setting passwport
 
 app.use(passport.initialize());
-
 require("./config/passport")(passport);
 
 mongoose
@@ -46,7 +49,7 @@ mongoose
   });
 
 app.get("/", (req, res) => {
-  res.send("This is Your Hello World!!");
+  res.send("<h1>Hello World!</h1>");
 });
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
