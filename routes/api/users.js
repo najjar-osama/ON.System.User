@@ -36,7 +36,11 @@ router.post("/register", (req, res) => {
           role: req.body.role,
           email: req.body.email,
           avatar: req.body.avatar,
-          password: req.body.password
+          password: req.body.password,
+          emailVerfication: {
+            verficationCode: randomatic("0", 6),
+            emailVerified: false
+          }
         });
 
         bcrypt.genSalt(10, (err, salt) => {
