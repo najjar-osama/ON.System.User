@@ -45,7 +45,9 @@ mongoose
   });
 
 app.get("/", (req, res) => {
-  res.send("<h1>Hello World!</h1>");
+  res.send(`<div style="color:purple;display:flex; justify-content:center;align-items:center;height:100%;">
+      <h1>Server is up & running...</h1>
+  </div>`);
 });
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
