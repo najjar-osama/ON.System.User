@@ -27,7 +27,12 @@ const UserSchema = new Schema({
   date: {
     type: Date,
     default: Date.now()
-  }
+  },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  emailVerfication: Schema.Types.Mixed
 });
 
 module.exports = User = mongoose.model("users", UserSchema);
