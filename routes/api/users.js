@@ -4,8 +4,8 @@ const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-//Load User Model
 
+//Load User Model
 const User = require("../../models/User");
 
 // @route   GET api/users/test
@@ -18,22 +18,16 @@ router.get("/test", (req, res) => {
 // @route   POST api/users/register
 // @desc    Register user
 // @access  Public
-
 router.post("/register", (req, res) => {
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       return res.status(409).json({ email: "Email already exists" });
     } else {
-      const avatar = gravatar.url(req.body.email, {
-        s: "200", // size
-        r: "pg", // rating
-        d: "mm" // Default
-      });
       const newUser = new User({
         name: req.body.name,
         role: req.body.role,
         email: req.body.email,
-        avatar,
+        avatar: req.body.avatar,
         password: req.body.password
       });
 
