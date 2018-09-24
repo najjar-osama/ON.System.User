@@ -4,6 +4,7 @@ const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const randomatic = require("randomatic");
 
 const validateRegistration = require("../../validation/users")
   .validateRegistration;
@@ -58,7 +59,6 @@ router.post("/register", (req, res) => {
 // @route   POST api/users/login
 // @desc    Login user / Return JWT token
 // @access  Public
-
 router.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
