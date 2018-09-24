@@ -8,6 +8,13 @@ const validateRegistration = ({
   passwordConfirmation,
   role
 }) => {
+  isEmpty(name) ? (name = "") : name;
+  isEmpty(email) ? (email = "") : email;
+  isEmpty(password) ? (password = "") : password;
+  isEmpty(passwordConfirmation)
+    ? (passwordConfirmation = "")
+    : passwordConfirmation;
+  isEmpty(role) ? (role = "") : role;
   const errors = {};
   if (!validator.isLength(name, { min: 2, max: 30 })) {
     errors.name = "Name must be between 2 and 30 characters";
@@ -23,23 +30,23 @@ const validateRegistration = ({
   }
 
   if (isEmpty(name)) {
-    errors.name = "Name fields is required.";
+    errors.name = "Name field is required.";
   }
   if (isEmpty(email)) {
-    errors.email = "Email fields is required.";
+    errors.email = "Email field is required.";
   }
   if (isEmpty(password)) {
-    errors.password = "Password fields is required.";
+    errors.password = "Password field is required.";
   }
   if (isEmpty(passwordConfirmation)) {
-    errors.passwordConfirmation = "Password confirmation fields is required.";
+    errors.passwordConfirmation = "Password confirmation field is required.";
   }
   if (isEmpty(role)) {
-    errors.role = "Role fields is required.";
+    errors.role = "Role field is required.";
   }
   return {
     errors,
-    isValid: !isEmpty(errors)
+    isValid: isEmpty(errors)
   };
 };
 

@@ -5,6 +5,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 
+const validateRegistration = require("../../validation/users")
+  .validateRegistration;
+
 //Load User Model
 const User = require("../../models/User");
 
@@ -19,30 +22,37 @@ router.get("/test", (req, res) => {
 // @desc    Register user
 // @access  Public
 router.post("/register", (req, res) => {
-  User.findOne({ email: req.body.email }).then(user => {
-    if (user) {
-      return res.status(409).json({ email: "Email already exists" });
-    } else {
-      const newUser = new User({
-        name: req.body.name,
-        role: req.body.role,
-        email: req.body.email,
-        avatar: req.body.avatar,
-        password: req.body.password
-      });
-
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then(user => res.json({ name: user.name }))
-            .catch(err => console.log(err));
+  const validation = validateRegistration(req.body);
+  if (validation.isValid) {
+    User.findOne({ email: req.body.email }).then(user => {
+      if (user) {
+        validation.errors.email = "Email is already in use.";
+        validation.isValid = false;
+        return res.status(409).json(validation);
+      } else {
+        const newUser = new User({
+          name: req.body.name,
+          role: req.body.role,
+          email: req.body.email,
+          avatar: req.body.avatar,
+          password: req.body.password
         });
-      });
-    }
-  });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            newUser
+              .save()
+              .then(user => res.json({ name: user.name }))
+              .catch(err => console.log(err));
+          });
+        });
+      }
+    });
+  } else {
+    return res.status(400).json(validation);
+  }
 });
 
 // @route   POST api/users/login
