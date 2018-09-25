@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const randomatic = require("randomatic");
+const sendEmailVerificationCode = require("../../utils/sendEmailVerificationCode");
 
 const validateRegistration = require("../../validation/users")
   .validateRegistration;
@@ -49,7 +50,17 @@ router.post("/register", (req, res) => {
             newUser.password = hash;
             newUser
               .save()
-              .then(user => res.json({ name: user.name }))
+              .then(user => {
+                sendEmailVerificationCode(
+                  user.email,
+                  user.name,
+                  user.emailVerfication.verficationCode
+                );
+                res.json({
+                  name: user.name,
+                  message: "a verifcation email has been sent ot your account!"
+                });
+              })
               .catch(err => console.log(err));
           });
         });
