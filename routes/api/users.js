@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
@@ -19,46 +18,52 @@ const User = require("../../models/User");
 router.post("/register", (req, res) => {
   const validation = validateRegistration(req.body);
   if (validation.isValid) {
-    User.findOne({ email: req.body.email }).then(user => {
-      if (user) {
-        validation.errors.email = "Email is already in use.";
-        validation.isValid = false;
-        return res.status(409).json(validation);
-      } else {
-        const newUser = new User({
-          name: req.body.name,
-          role: req.body.role,
-          email: req.body.email,
-          avatar: req.body.avatar,
-          password: req.body.password,
-          emailVerfication: {
-            verficationCode: randomatic("0", 6),
-            emailVerified: false
-          }
-        });
-
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => {
-                sendEmailVerificationCode(
-                  user.email,
-                  user.name,
-                  user.emailVerfication.verficationCode
-                );
-                res.json({
-                  name: user.name,
-                  message: "a verifcation email has been sent ot your account!"
-                });
-              })
-              .catch(err => console.log(err));
+    User.findOne({ email: req.body.email })
+      .then(user => {
+        if (user) {
+          validation.errors.email = "Email is already in use.";
+          validation.isValid = false;
+          return res.status(409).json(validation);
+        } else {
+          const newUser = new User({
+            name: req.body.name,
+            role: req.body.role,
+            email: req.body.email,
+            avatar: req.body.avatar,
+            password: req.body.password,
+            emailVerfication: {
+              verficationCode: randomatic("0", 6),
+              emailVerified: false
+            }
           });
-        });
-      }
-    });
+
+          bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if (err) throw err;
+              newUser.password = hash;
+              newUser
+                .save()
+                .then(user => {
+                  sendEmailVerificationCode(
+                    user.email,
+                    user.name,
+                    user.emailVerfication.verficationCode
+                  );
+                  res.json({
+                    user: {
+                      name: user.name,
+                      email: user.email
+                    },
+                    message:
+                      "A verfication code has been sent to the provided email address."
+                  });
+                })
+                .catch(error => res.status(400).json({ error }));
+            });
+          });
+        }
+      })
+      .catch(error => res.status(400).json({ error }));
   } else {
     return res.status(400).json(validation);
   }
@@ -112,4 +117,5 @@ router.get(
     res.json({ id: req.user.id, name: req.user.name, email: req.user.email });
   }
 );
+
 module.exports = router;
