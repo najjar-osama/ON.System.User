@@ -2,16 +2,16 @@ const sendgrid = require("@sendgrid/mail");
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendEmailVerificationCode = (email, name, code) => {
-  const emailHtmlBody = `<div style="background:#CCC;color:#333;height:100%;" >
+  const emailHtmlBody = `<div style="height:100%;" >
                     <p>Dear ${name},</p>
-                    <p>Thanks for registering ... </p>
+                    <p>Thanks for Signing up. </p>
                     <p>You can use this code to verify your email : <b>${code}</b>
                     <p></p>
                     <p>Best reagrds,</p>
                     <p>Dev team.</p>
                 </div>`;
   const emailPlainText = `Dear ${name},
-  Thanks for registering ...
+  Thanks for Signing up.
   You can use this code to verify your email : ${code}
 
   Best reagrds,
@@ -19,8 +19,8 @@ const sendEmailVerificationCode = (email, name, code) => {
 
   const message = {
     to: email,
-    from: "dev@sevenskys.io",
-    subject: "Welcome - Verify your email.",
+    from: "dev@company_name.com",
+    subject: "Welcome to NAME- Verify your email.",
     text: emailPlainText,
     html: emailHtmlBody
   };
