@@ -17,53 +17,55 @@ const User = require("../../models/User");
 // @access  Public
 router.post("/register", (req, res) => {
   const validation = validateRegistration(req.body);
+
   if (validation.isValid) {
     User.findOne({ email: req.body.email })
       .then(user => {
+        // user already there!
         if (user) {
           validation.errors.email = "Email is already in use.";
           validation.isValid = false;
           return res.status(409).json(validation);
-        } else {
-          const newUser = new User({
-            name: req.body.name,
-            role: req.body.role,
-            email: req.body.email,
-            avatar: req.body.avatar,
-            password: req.body.password,
-            emailVerfication: {
-              verficationCode: randomatic("0", 6),
-              emailVerified: false
-            }
-          });
-
-          bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(newUser.password, salt, (err, hash) => {
-              if (err) throw err;
-              newUser.password = hash;
-              newUser
-                .save()
-                .then(user => {
-                  sendEmailVerificationCode(
-                    user.email,
-                    user.name,
-                    user.emailVerfication.verficationCode
-                  );
-                  res.json({
-                    user: {
-                      name: user.name,
-                      email: user.email
-                    },
-                    message:
-                      "A verfication code has been sent to the provided email address."
-                  });
-                })
-                .catch(error => res.status(400).json({ error }));
-            });
-          });
         }
+        // create new user
+        const newUser = new User({
+          name: req.body.name,
+          role: req.body.role,
+          email: req.body.email,
+          avatar: req.body.avatar,
+          password: req.body.password,
+          emailVerfication: {
+            verficationCode: randomatic("0", 6),
+            emailVerified: false
+          }
+        });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (error, hash) => {
+            if (error) {
+              return res.status(500).json({ error });
+            }
+            newUser.password = hash;
+            newUser
+              .save()
+              .then(user => {
+                sendEmailVerificationCode(
+                  user.email,
+                  user.name,
+                  user.emailVerfication.verficationCode
+                );
+                return user;
+              })
+              .then(user => {
+                // created
+                res.status(201).json(handleSucessRegistrationResponse(user));
+              })
+              // error while creating new user.
+              .catch(error => res.status(500).json({ error }));
+          });
+        });
       })
-      .catch(error => res.status(400).json({ error }));
+      .catch(error => res.status(500).json({ error }));
   } else {
     return res.status(400).json(validation);
   }
@@ -117,5 +119,17 @@ router.get(
     res.json({ id: req.user.id, name: req.user.name, email: req.user.email });
   }
 );
+
+const handleSucessRegistrationResponse = ({ name, email, role, avatar }) => ({
+  data: {
+    type: "users",
+    attributes: {
+      name,
+      email,
+      role,
+      avatar
+    }
+  }
+});
 
 module.exports = router;
